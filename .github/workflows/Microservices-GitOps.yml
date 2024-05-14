@@ -1,0 +1,122 @@
+name: Microservice App Deploy - GitOps
+
+on: 
+  workflow_dispatch:
+    inputs:
+      ACRNAME:
+        description: 'The Name of the ACR resource'
+        required: true
+        type: string
+      ENVIRONMENT:
+        description: 'A GitHub Environment to pull action secrets from'
+        required: true
+        type: environment
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+  actions: write
+
+jobs:
+  BuildPush:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.ENVIRONMENT }}
+    steps:
+      - name: Get application code from repo
+        uses: actions/checkout@v2
+      
+      - name: Log into Azure subscription
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true
+      
+      - name: Connect to Azure Container Registry (ACR)
+        id: acrconnect
+        run: |
+          echo "Retrieving access token from ${{ inputs.ACRNAME }}"
+          TOKEN=$(az acr login -n ${{ inputs.ACRNAME }} --expose-token)
+
+          if [ -z "$TOKEN" ]; 
+          then
+            echo "ACR Token was not retrieved successfully"
+            exit 1
+          fi
+
+          ACRTOKEN=$(echo $TOKEN | jq -r ".accessToken")
+          LOGINSERVER=$(echo $TOKEN | jq -r ".loginServer")
+
+          echo "ACR Login Server: $LOGINSERVER"
+          echo "::set-output name=loginServer::$LOGINSERVER"
+
+          echo "Passing token as stdin to docker login"
+          echo $ACRTOKEN | docker login $LOGINSERVER -u 00000000-0000-0000-0000-000000000000 --password-stdin
+
+      - name: Build and push order-service image
+        run: |
+          cd workloads/src/order-service
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/order-service:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/order-service:${{ github.run_number }}
+
+      - name: Build and push product-service image
+        run: |
+          cd workloads/src/product-service
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/product-service:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/product-service:${{ github.run_number }}
+
+      - name: Build and push store-front image
+        run: |
+          cd workloads/src/store-front
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/store-front:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/store-front:${{ github.run_number }}
+
+      - name: Pull and push rabbitmq image
+        run: |
+          docker pull rabbitmq:3.11.17-management-alpine
+          docker tag rabbitmq:3.11.17-management-alpine ${{ inputs.ACRNAME }}.azurecr.io/rabbitmq:3.11.17-management-alpine
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/rabbitmq:3.11.17-management-alpine
+
+  Update-K8s-Manifests:
+    name: Update K8s Deployment Manifest with Image Version
+    needs: BuildPush
+    environment: ${{ inputs.ENVIRONMENT }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Update image name in manifest file
+        uses: azure/powershell@v1
+        with:
+          inlineScript: |
+            $line1 = Get-Content workloads/src/order-service.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line2 = Get-Content workloads/src/product-service.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line3 = Get-Content workloads/src/store-front.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line4 = Get-Content workloads/src/rabbitmq.yaml | Select-String image: | Select-Object -ExpandProperty Line
+
+            $content1 = Get-Content workloads/src/order-service.deployment.yaml
+            $content1 | ForEach-Object {$_ -replace $line1,"        image: ${{ inputs.ACRNAME }}.azurecr.io/order-service:${{ github.run_number }}"} | Set-Content workloads/src/order-service.deployment.yaml
+
+            $content2 = Get-Content workloads/src/product-service.deployment.yaml
+            $content2 | ForEach-Object {$_ -replace $line2,"        image: ${{ inputs.ACRNAME }}.azurecr.io/product-service:${{ github.run_number }}"} | Set-Content workloads/src/product-service.deployment.yaml
+
+            $content3 = Get-Content workloads/src/store-front.deployment.yaml
+            $content3 | ForEach-Object {$_ -replace $line3,"        image: ${{ inputs.ACRNAME }}.azurecr.io/store-front:${{ github.run_number }}"} | Set-Content workloads/src/store-front.deployment.yaml
+
+            $content4 = Get-Content workloads/src/rabbitmq.yaml
+            $content4 | ForEach-Object {$_ -replace $line4,"        image: ${{ inputs.ACRNAME }}.azurecr.io/rabbitmq:${{ github.run_number }}"} | Set-Content workloads/src/rabbitmq.yaml
+
+          azPSVersion: "latest"
+    
+      - name: Commit changes in manifest to repo
+        run: | 
+          git config user.name "GitHub Actions Bot"
+          git config user.email ""
+          git add workloads/src/order-service.deployment.yaml
+          git add workloads/src/product-service.deployment.yaml
+          git add workloads/src/store-front.deployment.yaml
+          git add workloads/src/rabbitmq.yaml
+          git commit -m "Update image version in K8s Deployment manifests file"
+          git push origin
