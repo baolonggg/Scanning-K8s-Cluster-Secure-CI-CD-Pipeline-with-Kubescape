@@ -17,7 +17,7 @@ spec:
         "kubernetes.io/os": linux
       containers:
       - name: product-service
-        image: acr4nt534.azurecr.io/product-service:2
+        image: acr4nt534.azurecr.io/product-service:1
         ports:
         - containerPort: 3002
         env: 
