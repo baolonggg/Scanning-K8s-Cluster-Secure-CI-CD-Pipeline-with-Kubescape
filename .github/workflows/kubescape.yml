@@ -8,11 +8,12 @@ jobs:
     - uses: kubescape/github-action@main
       continue-on-error: true
       with:
-        format: pretty-printer 
+        format: junit
         # # Optional: Specify the Kubescape cloud account ID
         # account: ${{secrets.KUBESCAPE_ACCOUNT}}
         # # Optional: Scan a specific path. Default will scan the whole repository
         # files: "examples/*.yaml"
-    - name: Display Kubescape Results 
-      run: 
-        cat results.out
+    - uses: mikepenz/action-junit-report@v3
+      with: 
+        report_paths: "*.xml"
+
