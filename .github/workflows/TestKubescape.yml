@@ -74,13 +74,13 @@ jobs:
 
       - name: Build and push adservice image
         run: |
-          cd workloads/src2/src/adservice
+          cd workloads/src2/adservice
           docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/adservice:${{ github.run_number }}
           docker push ${{ inputs.ACRNAME }}.azurecr.io/adservice:${{ github.run_number }}
       
       - name: Build and push cartservice image
         run: |
-          cd workloads/src2/cartservice
+          cd workloads/src2/src/cartservice
           docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/cartservice:${{ github.run_number }}
           docker push ${{ inputs.ACRNAME }}.azurecr.io/cartservice:${{ github.run_number }}
 
