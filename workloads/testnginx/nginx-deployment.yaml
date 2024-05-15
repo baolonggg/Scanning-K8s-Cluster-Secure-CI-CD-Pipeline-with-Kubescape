@@ -1,0 +1,26 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata: 
+  name: nginx-deployment
+spec: 
+  replicas: 0
+  selector: 
+    matchLabels: 
+      app: nginx 
+  template: 
+    metadata: 
+      labels: 
+        app: nginx 
+    spec: 
+      containers: 
+      - name: nginx-demo 
+        image: nginx:1.15.2 
+
+        securityContext: 
+          allowPrivilegeEscalation: true
+          resourse: 
+            limits:
+              cpu: 1
+              memory: 1024Mi
+        ports:
+        - containerPort: 80 
