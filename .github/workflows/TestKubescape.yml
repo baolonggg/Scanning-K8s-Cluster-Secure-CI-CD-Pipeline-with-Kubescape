@@ -1,15 +1,10 @@
-name: App Deploy Flask - GitOps - Kubescape
+name: 2 Microservice App Deploy - GitOps
 
 on: 
   workflow_dispatch:
     inputs:
       ACRNAME:
         description: 'The Name of the ACR resource'
-        required: true
-        type: string
-      APPNAME:
-        description: 'The Name of the Application to deploy'
-        default: "flask"
         required: true
         type: string
       ENVIRONMENT:
@@ -20,20 +15,19 @@ on:
 permissions:
   id-token: write
   contents: write
+  pull-requests: write
+  actions: write
 
 jobs:
   BuildPush:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.Environment }}
+    environment: ${{ inputs.ENVIRONMENT }}
     steps:
-      # Get application code from repo
       - name: Get application code from repo
-        uses: actions/checkout@main
-        with:
-          repository: ${{ inputs.AppRepo}}
+        uses: actions/checkout@v2
       
-      # Logs into your Azure subscription
-      - uses: azure/login@v1
+      - name: Log into Azure subscription
+        uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -43,11 +37,10 @@ jobs:
       - name: Connect to Azure Container Registry (ACR)
         id: acrconnect
         run: |
-          echo "Retrieving access token from ${{ inputs.ACRNAME}}"
-          TOKEN=$(az acr login -n ${{ inputs.ACRNAME}} --expose-token)
+          echo "Retrieving access token from ${{ inputs.ACRNAME }}"
+          TOKEN=$(az acr login -n ${{ inputs.ACRNAME }} --expose-token)
 
-          if [ -z "$TOKEN" ]
-          then
+          if [ -z "$TOKEN" ]; then
             echo "ACR Token was not retrieved successfully"
             exit 1
           fi
@@ -61,58 +54,203 @@ jobs:
           echo "Passing token as stdin to docker login"
           echo $ACRTOKEN | docker login $LOGINSERVER -u 00000000-0000-0000-0000-000000000000 --password-stdin
 
-      # Builds and Pushes the container image to the Azure Container Registry (ACR)
-      - name: Container build and push to a Azure Container Registry (ACR)
-        env:
-          APPNAME: "${{ inputs.APPNAME }}"
+      - name: Build and push order-service image
         run: |
-          cd "workloads/$APPNAME"
-          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/${{ inputs.APPNAME }}:${{ github.run_number }}
-          docker images
-          docker push ${{ inputs.ACRNAME }}.azurecr.io/${{ inputs.APPNAME }}:${{ github.run_number }}
+          cd workloads/src/order-service
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/order-service:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/order-service:${{ github.run_number }}
+
+      - name: Build and push product-service image
+        run: |
+          cd workloads/src/product-service
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/product-service:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/product-service:${{ github.run_number }}
+
+      - name: Build and push store-front image
+        run: |
+          cd workloads/src/store-front
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/store-front:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/store-front:${{ github.run_number }}
+
+      - name: Build and push adservice image
+        run: |
+          cd workloads/src2/adservice
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/adservice:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/adservice:${{ github.run_number }}
+      
+      - name: Build and push cartservice image
+        run: |
+          cd workloads/src2/cartservice
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/cartservice:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/cartservice:${{ github.run_number }}
+
+        - name: Build and push checkoutservice image
+        run: |
+          cd workloads/src2/checkoutservice
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/checkoutservice:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/checkoutservice:${{ github.run_number }}
+
+      - name: Build and push currencyservice image
+        run: |
+          cd workloads/src2/currencyservice
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/currencyservice:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/currencyservice:${{ github.run_number }}
+
+      - name: Build and push emailservice image
+        run: |
+          cd workloads/src2/emailservice
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/emailservice:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/emailservice:${{ github.run_number }}
+
+      - name: Build and push frontend image
+        run: |
+          cd workloads/src2/frontend
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/frontend:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/frontend:${{ github.run_number }}
+      
+      - name: Build and push loadgenerator image
+        run: |
+          cd workloads/src2/loadgenerator
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/loadgenerator:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/loadgenerator:${{ github.run_number }}
+
+      - name: Build and push paymentservice image
+        run: |
+          cd workloads/src2/paymentservice
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/paymentservice:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/paymentservice:${{ github.run_number }}
+
+      - name: Build and push productcatalogservice image
+        run: |
+          cd workloads/src2/productcatalogservice
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/productcatalogservice:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/productcatalogservice:${{ github.run_number }}
+
+      - name: Build and push recommendationservice image
+        run: |
+          cd workloads/src2/recommendationservice
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/recommendationservice:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/recommendationservice:${{ github.run_number }}
+
+      - name: Build and push shippingserivce image
+        run: |
+          cd workloads/src2/shippingservice
+          docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/shippingservice:${{ github.run_number }}
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/shippingservice:${{ github.run_number }}
+      
+      - name: Pull and push redis image
+        run: |
+          docker pull redis:alpine
+          docker tag redis:alpine ${{ inputs.ACRNAME }}.azurecr.io/redis:alpine
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/redis:alpine
+
+      - name: Pull and push rabbitmq image
+        run: |
+          docker pull rabbitmq:3.11.17-management-alpine
+          docker tag rabbitmq:3.11.17-management-alpine ${{ inputs.ACRNAME }}.azurecr.io/rabbitmq:3.11.17-management-alpine
+          docker push ${{ inputs.ACRNAME }}.azurecr.io/rabbitmq:3.11.17-management-alpine
 
   Update-K8s-Manifests:
     name: Update K8s Deployment Manifest with Image Version
     needs: BuildPush
-    environment: ${{ inputs.Environment }}
+    environment: ${{ inputs.ENVIRONMENT }}
     runs-on: ubuntu-latest
     steps:
-      # Checks out the baseline repository
       - uses: actions/checkout@v2
 
       - name: Update image name in manifest file
         uses: azure/powershell@v1
         with:
           inlineScript: |
-            $line = Get-Content workloads/flask/deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
-            $content = Get-Content workloads/flask/deployment.yaml
-            $content | ForEach-Object {$_ -replace $line,"        image: ${{ inputs.ACRNAME }}.azurecr.io/${{ inputs.APPNAME }}:${{ github.run_number }}"} | Set-Content workloads/flask/deployment.yaml
+            $line1 = Get-Content workloads/src/order-service.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line2 = Get-Content workloads/src/product-service.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line3 = Get-Content workloads/src/store-front.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line4 = Get-Content workloads/src/rabbitmq.yaml | Select-String image: | Select-Object -ExpandProperty Line
+
+            $line5 = Get-Content workloads/src2/adservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line6 = Get-Content workloads/src2/cartservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line7 = Get-Content workloads/src2/checkout.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line8 = Get-Content workloads/src2/currencyservice.yaml | Select-String image: | Select-Object -ExpandProperty Line
+
+            $line9 = Get-Content workloads/src2/emailservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line10 = Get-Content workloads/src2/frontend.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line11 = Get-Content workloads/src2/loadgenerator.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line12 = Get-Content workloads/src2/paymentservice.yaml | Select-String image: | Select-Object -ExpandProperty Line
+
+            $line13 = Get-Content workloads/src2/productcatalogservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line14 = Get-Content workloads/src2/recommendationservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line15 = Get-Content workloads/src2/shippingservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line16 = Get-Content workloads/src2/rediscart.yaml | Select-String image: | Select-Object -ExpandProperty Line
+
+            $content1 = Get-Content workloads/src/order-service.deployment.yaml
+            $content1 | ForEach-Object {$_ -replace $line1,"        image: ${{ inputs.ACRNAME }}.azurecr.io/order-service:${{ github.run_number }}"} | Set-Content workloads/src/order-service.deployment.yaml
+
+            $content2 = Get-Content workloads/src/product-service.deployment.yaml
+            $content2 | ForEach-Object {$_ -replace $line2,"        image: ${{ inputs.ACRNAME }}.azurecr.io/product-service:${{ github.run_number }}"} | Set-Content workloads/src/product-service.deployment.yaml
+
+            $content3 = Get-Content workloads/src/store-front.deployment.yaml
+            $content3 | ForEach-Object {$_ -replace $line3,"        image: ${{ inputs.ACRNAME }}.azurecr.io/store-front:${{ github.run_number }}"} | Set-Content workloads/src/store-front.deployment.yaml
+
+            $content4 = Get-Content workloads/src/rabbitmq.yaml
+            $content4 | ForEach-Object {$_ -replace $line4,"        image: ${{ inputs.ACRNAME }}.azurecr.io/rabbitmq:${{ github.run_number }}"} | Set-Content workloads/src/rabbitmq.yaml
+
+            $content5 = Get-Content workloads/src2/adservice.deployment.yaml
+            $content5 | ForEach-Object {$_ -replace $line5,"        image: ${{ inputs.ACRNAME }}.azurecr.io/adservice:${{ github.run_number }}"} | Set-Content workloads/src2/adservice.deployment.yaml
+
+            $content6 = Get-Content workloads/src2/cartservice.deployment.yaml
+            $content6 | ForEach-Object {$_ -replace $line6,"        image: ${{ inputs.ACRNAME }}.azurecr.io/cartservice:${{ github.run_number }}"} | Set-Content workloads/src2/cartservice.deployment.yaml
+
+            $content7 = Get-Content workloads/src2/checkoutservice.deployment.yaml
+            $content7 | ForEach-Object {$_ -replace $line7,"        image: ${{ inputs.ACRNAME }}.azurecr.io/checkoutservice:${{ github.run_number }}"} | Set-Content workloads/src2/checkoutservice.deployment.yaml
+
+            $content8 = Get-Content workloads/src2/currencyservice.deployment.yaml
+            $content8 | ForEach-Object {$_ -replace $line8,"        image: ${{ inputs.ACRNAME }}.azurecr.io/currencyservice:${{ github.run_number }}"} | Set-Content workloads/src2/currencyservice.deployment.yaml
+
+            $content9 = Get-Content workloads/src2/emailservice.deployment.yaml
+            $content9 | ForEach-Object {$_ -replace $line9,"        image: ${{ inputs.ACRNAME }}.azurecr.io/emailservice:${{ github.run_number }}"} | Set-Content workloads/src2/emailservice.deployment.yaml
+
+            $content10 = Get-Content workloads/src2/frontend.deployment.yaml
+            $content10 | ForEach-Object {$_ -replace $line10,"        image: ${{ inputs.ACRNAME }}.azurecr.io/frontend:${{ github.run_number }}"} | Set-Content workloads/src2/frontend.deployment.yaml
+
+            $content11 = Get-Content workloads/src2/loadgenerator.deployment.yaml
+            $content11 | ForEach-Object {$_ -replace $line11,"        image: ${{ inputs.ACRNAME }}.azurecr.io/loadgenerator:${{ github.run_number }}"} | Set-Content workloads/src2/loadgenerator.deployment.yaml
+
+            $content12 = Get-Content workloads/src2/paymentservice.deployment.yaml
+            $content12 | ForEach-Object {$_ -replace $line12,"        image: ${{ inputs.ACRNAME }}.azurecr.io/paymentservice:${{ github.run_number }}"} | Set-Content workloads/src2/paymentservice.deployment.yaml
+
+            $content13 = Get-Content workloads/src2/productcatalogservice.deployment.yaml
+            $content13 | ForEach-Object {$_ -replace $line13,"        image: ${{ inputs.ACRNAME }}.azurecr.io/productcatalogservice:${{ github.run_number }}"} | Set-Content workloads/src2/productcatalogservice.deployment.yaml
+
+            $content14 = Get-Content workloads/src2/recommendationservice.deployment.yaml
+            $content14 | ForEach-Object {$_ -replace $line14,"        image: ${{ inputs.ACRNAME }}.azurecr.io/recommendationservice:${{ github.run_number }}"} | Set-Content workloads/src2/recommendationservice.deployment.yaml
+
+            $content15 = Get-Content workloads/src2/shippingservice.deployment.yaml
+            $content15 | ForEach-Object {$_ -replace $line15,"        image: ${{ inputs.ACRNAME }}.azurecr.io/shippingservice:${{ github.run_number }}"} | Set-Content workloads/src2/shippingservice.deployment.yaml
+
+            $content16 = Get-Content workloads/src2/rediscart.deployment.yaml
+            $content16 | ForEach-Object {$_ -replace $line16,"        image: ${{ inputs.ACRNAME }}.azurecr.io/redis:${{ github.run_number }}"} | Set-Content workloads/src2/rediscart.deployemnt.yaml
           azPSVersion: "latest"
+    
     
       - name: Commit changes in manifest to repo
         run: | 
           git config user.name "GitHub Actions Bot"
           git config user.email ""
-          git add workloads/flask/deployment.yaml
+          git add workloads/src/order-service.deployment.yaml
+          git add workloads/src/product-service.deployment.yaml
+          git add workloads/src/store-front.deployment.yaml
+          git add workloads/src/rabbitmq.yaml
+          git add workloads/src2/adservice.deployment.yaml
+          git add workloads/src2/cartservice.deployment.yaml
+          git add workloads/src2/checkoutservice.deployment.yaml
+          git add workloads/src2/currencyservice.deployment.yaml
+          git add workloads/src2/emailservice.deployment.yaml
+          git add workloads/src2/frontend.deployment.yaml
+          git add workloads/src2/loadgenerator.deployment.yaml
+          git add workloads/src2/paymentservice.deployment.yaml
+          git add workloads/src2/productcatalogservice.deployment.yaml
+          git add workloads/src2/recommendationservice.deployment.yaml
+          git add workloads/src2/shippingservice.deployment.yaml
+          git add workloads/src2/rediscart.deployment.yaml
           git commit -m "Update image version in K8s Deployment manifests file"
           git push origin
-
-  Run-Kubescape:
-    name: Run Kubescape
-    needs: Update-K8s-Manifests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Kubescape
-        run: |
-          mkdir -p $HOME/.local/bin
-          export PATH=$PATH:$HOME/.local/bin
-          curl -s https://raw.githubusercontent.com/kubescape/kubescape/master/install.sh | /bin/bash
-      
-      - name: Checkout the repository
-        uses: actions/checkout@v2
-
-      - name: Run Kubescape scan
-        run: |
-          export PATH=$PATH:/home/runner/.kubescape/bin
-          cd workloads/${{ inputs.APPNAME }}
-          kubescape scan --format junit --output results.xml .
