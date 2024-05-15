@@ -14,8 +14,8 @@ jobs:
         with:
           format: sarif
           outputFile: results
-          failedThreshold: 90
-          severityThreshold: critical
+          failedThreshold: 80
+          severityThreshold: high
       - name: Upload Kubescape scan results to Github Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
