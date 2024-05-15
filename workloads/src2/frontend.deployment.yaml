@@ -30,7 +30,7 @@ spec:
                 - ALL
             privileged: false
             readOnlyRootFilesystem: true
-        image: acr4nt534.azurecr.io/frontend:9
+          image: acr4nt534.azurecr.io/frontend:9
           ports:
           - containerPort: 8080
           readinessProbe:
@@ -125,4 +125,3 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: frontend
----
