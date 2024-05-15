@@ -1,4 +1,4 @@
-name: 2 Microservice App Deploy - GitOps  
+name: 2 Microservice App Deploy - GitOps
 
 on: 
   workflow_dispatch:
