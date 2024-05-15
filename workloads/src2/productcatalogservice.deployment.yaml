@@ -29,7 +29,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.10.0
+        image: acr4nt534.azurecr.io/productcatalogservice:9
         ports:
         - containerPort: 3550
         env:

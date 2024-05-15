@@ -29,7 +29,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: gcr.io/google-samples/microservices-demo/paymentservice:v0.10.0
+        image: acr4nt534.azurecr.io/paymentservice:9
         ports:
         - containerPort: 50051
         env:
