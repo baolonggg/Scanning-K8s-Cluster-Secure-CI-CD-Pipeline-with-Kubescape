@@ -169,7 +169,7 @@ jobs:
 
             $line5 = Get-Content workloads/src2/adservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
             $line6 = Get-Content workloads/src2/cartservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
-            $line7 = Get-Content workloads/src2/checkout.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line7 = Get-Content workloads/src2/checkoutservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
             $line8 = Get-Content workloads/src2/currencyservice.yaml | Select-String image: | Select-Object -ExpandProperty Line
 
             $line9 = Get-Content workloads/src2/emailservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
