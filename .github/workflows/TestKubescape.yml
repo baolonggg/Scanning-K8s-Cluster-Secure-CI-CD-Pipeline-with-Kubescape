@@ -170,17 +170,17 @@ jobs:
             $line5 = Get-Content workloads/src2/adservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
             $line6 = Get-Content workloads/src2/cartservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
             $line7 = Get-Content workloads/src2/checkoutservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
-            $line8 = Get-Content workloads/src2/currencyservice.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line8 = Get-Content workloads/src2/currencyservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
 
             $line9 = Get-Content workloads/src2/emailservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
             $line10 = Get-Content workloads/src2/frontend.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
             $line11 = Get-Content workloads/src2/loadgenerator.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
-            $line12 = Get-Content workloads/src2/paymentservice.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line12 = Get-Content workloads/src2/paymentservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
 
             $line13 = Get-Content workloads/src2/productcatalogservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
             $line14 = Get-Content workloads/src2/recommendationservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
             $line15 = Get-Content workloads/src2/shippingservice.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
-            $line16 = Get-Content workloads/src2/rediscart.yaml | Select-String image: | Select-Object -ExpandProperty Line
+            $line16 = Get-Content workloads/src2/rediscart.deployment.yaml | Select-String image: | Select-Object -ExpandProperty Line
 
             $content1 = Get-Content workloads/src/order-service.deployment.yaml
             $content1 | ForEach-Object {$_ -replace $line1,"        image: ${{ inputs.ACRNAME }}.azurecr.io/order-service:${{ github.run_number }}"} | Set-Content workloads/src/order-service.deployment.yaml
