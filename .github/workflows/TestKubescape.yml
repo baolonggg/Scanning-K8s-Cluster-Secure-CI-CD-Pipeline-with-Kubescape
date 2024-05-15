@@ -84,7 +84,7 @@ jobs:
           docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/cartservice:${{ github.run_number }}
           docker push ${{ inputs.ACRNAME }}.azurecr.io/cartservice:${{ github.run_number }}
 
-        - name: Build and push checkoutservice image
+      - name: Build and push checkoutservice image
         run: |
           cd workloads/src2/checkoutservice
           docker build . -t ${{ inputs.ACRNAME }}.azurecr.io/checkoutservice:${{ github.run_number }}
@@ -228,7 +228,7 @@ jobs:
             $content15 | ForEach-Object {$_ -replace $line15,"        image: ${{ inputs.ACRNAME }}.azurecr.io/shippingservice:${{ github.run_number }}"} | Set-Content workloads/src2/shippingservice.deployment.yaml
 
             $content16 = Get-Content workloads/src2/rediscart.deployment.yaml
-            $content16 | ForEach-Object {$_ -replace $line16,"        image: ${{ inputs.ACRNAME }}.azurecr.io/redis:${{ github.run_number }}"} | Set-Content workloads/src2/rediscart.deployemnt.yaml
+            $content16 | ForEach-Object {$_ -replace $line16,"        image: ${{ inputs.ACRNAME }}.azurecr.io/redis:${{ github.run_number }}"} | Set-Content workloads/src2/rediscart.deployment.yaml
           azPSVersion: "latest"
     
     
