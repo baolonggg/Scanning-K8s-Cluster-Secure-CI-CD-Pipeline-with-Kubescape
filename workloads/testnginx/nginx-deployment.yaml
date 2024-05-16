@@ -1,26 +1,25 @@
-apiVersion: apps/v1 
+apiVersion: apps/v1
 kind: Deployment
-metadata: 
+metadata:
   name: nginx-deployment
-spec: 
-  replicas: 0
-  selector: 
-    matchLabels: 
-      app: nginx 
-  template: 
-    metadata: 
-      labels: 
-        app: nginx 
-    spec: 
-      containers: 
-      - name: nginx-demo 
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx-demo
         image: acr4nt534.azurecr.io/nginx:1.25.4
-
-        securityContext: 
+        securityContext:
           allowPrivilegeEscalation: true
-          resourse: 
-            limits:
-              cpu: 1
-              memory: 1024Mi
+        resources: 
+          limits:
+            cpu: "1"
+            memory: "1024Mi"
         ports:
-        - containerPort: 80 
+        - containerPort: 80
