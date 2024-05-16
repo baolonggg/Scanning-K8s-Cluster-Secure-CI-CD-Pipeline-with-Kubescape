@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: nginx-deployment
 spec:
-  replicas: 1 
+  replicas: 0 
   selector:
     matchLabels:
       app: nginx
@@ -17,9 +17,9 @@ spec:
         image: acr4nt534.azurecr.io/nginx:1.25.4
         securityContext:
           allowPrivilegeEscalation: true
-        resources: 
-          limits:
-            cpu: "200m"
-            memory: "128Mi"
+        # resources: 
+        #   limits:
+        #     cpu: "200m"
+        #     memory: "128Mi"
         ports:
         - containerPort: 80
