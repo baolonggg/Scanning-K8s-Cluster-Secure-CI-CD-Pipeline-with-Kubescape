@@ -19,7 +19,7 @@ spec:
           allowPrivilegeEscalation: true
         resources: 
           limits:
-            cpu: "1"
+            cpu: "200m"
             memory: "128Mi"
         ports:
         - containerPort: 80
