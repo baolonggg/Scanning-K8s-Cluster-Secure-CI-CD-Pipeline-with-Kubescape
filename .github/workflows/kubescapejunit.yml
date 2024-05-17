@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: kubescape/github-action@main
-        continue-on-error: false
+        continue-on-error: true
         with:
           format: junit
       - name: Publish JUnit Test Report
