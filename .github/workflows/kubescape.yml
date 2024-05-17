@@ -1,7 +1,7 @@
 name: Kubescape scanning for misconfigurations
 on: [push, pull_request]
 jobs:
-  kubescape:
+  kubescape1:
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -20,3 +20,17 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: results.sarif
+  kubescape2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: kubescape/github-action@main
+        continue-on-error: false
+        with:
+          format: junit
+          severityThreshold: critical
+          failedThreshold: 80
+        uses: mikepenz/action-junit-report@v3
+        with:
+          report_paths: "*.xml"
+    
