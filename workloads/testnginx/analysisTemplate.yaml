@@ -1,0 +1,29 @@
+kind: AnalysisTemplate
+apiVersion: argoproj.io/v1alpha1
+metadata: 
+  name: nginx-scan 
+spec: 
+  metrics: 
+  - name: nginx-scan 
+    provider: 
+      job:
+        spec:
+          ttlSecondsAfterFinished: 86400
+          template: 
+            spec: 
+              serviceAccountName: kubescape-scan 
+              containers: 
+                - name: kubescape
+                  image: acr4nt534.azurecr.io/kubescape-cli:latest
+                  command: ["/busybox/sh", "-c"]
+                  args: 
+                    -> 
+                      echo "kubescape is running"; 
+                      kubescape scan workload --severity-threshold=high --namespace=nginx-ks deployment/nginx-deployment
+                  env: 
+                    - name: VERBOSE
+                      value: "on"
+                    - name: FRAMEWORKS
+                      value: MITRE
+              restartPolicy: Never
+          backoffLimit: 1        
