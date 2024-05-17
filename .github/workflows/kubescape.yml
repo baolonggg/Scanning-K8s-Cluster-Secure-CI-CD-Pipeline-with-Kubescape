@@ -20,17 +20,3 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: results.sarif
-  kubescape2:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: kubescape/github-action@main
-        continue-on-error: false
-        with:
-          format: junit
-          severityThreshold: critical
-          failedThreshold: 80
-      - name: Publish JUnit Test Report
-        uses: mikepenz/action-junit-report@v3
-        with:
-          report_paths: "*.xml"
