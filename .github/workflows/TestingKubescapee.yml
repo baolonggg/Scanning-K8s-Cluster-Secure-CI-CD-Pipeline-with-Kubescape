@@ -81,6 +81,7 @@ jobs:
   Run-Kubescape:
     name: Run Kubescape
     #needs: Update-K8s-Manifests
+    needs: BuildPush
     runs-on: ubuntu-latest
     steps:
       - name: Install Kubescape
@@ -96,11 +97,11 @@ jobs:
         run: |
           export PATH=$PATH:/home/runner/.kubescape/bin
           cd workloads/${{ inputs.APPNAME }}
-          kubescape scan --format junit --output results.xml .
+          kubescape scan --severity-theshold=high --format junit --output results.xml .
           
   Update-K8s-Manifests:
     name: Update K8s Deployment Manifest with Image Version
-    needs: BuildPush
+    needs: Run-Kubescape
     environment: ${{ inputs.ENVIRONMENT }}
     runs-on: ubuntu-latest
     steps:
