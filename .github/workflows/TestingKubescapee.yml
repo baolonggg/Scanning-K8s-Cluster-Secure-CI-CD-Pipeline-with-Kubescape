@@ -97,7 +97,7 @@ jobs:
         run: |
           export PATH=$PATH:/home/runner/.kubescape/bin
           cd workloads/${{ inputs.APPNAME }}
-          kubescape scan --severity-theshold=critical --format junit --output results.xml .
+          kubescape scan workload --severity-theshold critical --format junit --output results.xml .
           
   Update-K8s-Manifests:
     name: Update K8s Deployment Manifest with Image Version
