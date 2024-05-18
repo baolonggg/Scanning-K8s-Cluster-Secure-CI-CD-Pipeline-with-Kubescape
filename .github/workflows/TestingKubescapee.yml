@@ -80,7 +80,7 @@ jobs:
 
   Run-Kubescape:
     name: Run Kubescape
-    needs: Update-K8s-Manifests
+    #needs: Update-K8s-Manifests
     runs-on: ubuntu-latest
     steps:
       - name: Install Kubescape
