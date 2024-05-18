@@ -78,6 +78,26 @@ jobs:
           docker tag rabbitmq:3.11.17-management-alpine ${{ inputs.ACRNAME }}.azurecr.io/rabbitmq:3.11.17-management-alpine
           docker push ${{ inputs.ACRNAME }}.azurecr.io/rabbitmq:3.11.17-management-alpine
 
+  Run-Kubescape:
+    name: Run Kubescape
+    needs: Update-K8s-Manifests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Kubescape
+        run: |
+          mkdir -p $HOME/.local/bin
+          export PATH=$PATH:$HOME/.local/bin
+          curl -s https://raw.githubusercontent.com/kubescape/kubescape/master/install.sh | /bin/bash
+      
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Run Kubescape scan
+        run: |
+          export PATH=$PATH:/home/runner/.kubescape/bin
+          cd workloads/${{ inputs.APPNAME }}
+          kubescape scan --format junit --output results.xml .
+          
   Update-K8s-Manifests:
     name: Update K8s Deployment Manifest with Image Version
     needs: BuildPush
@@ -120,22 +140,3 @@ jobs:
           git commit -m "Update image version in K8s Deployment manifests file"
           git push origin
 
-  Run-Kubescape:
-    name: Run Kubescape
-    needs: Update-K8s-Manifests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install Kubescape
-        run: |
-          mkdir -p $HOME/.local/bin
-          export PATH=$PATH:$HOME/.local/bin
-          curl -s https://raw.githubusercontent.com/kubescape/kubescape/master/install.sh | /bin/bash
-      
-      - name: Checkout the repository
-        uses: actions/checkout@v2
-
-      - name: Run Kubescape scan
-        run: |
-          export PATH=$PATH:/home/runner/.kubescape/bin
-          cd workloads/${{ inputs.APPNAME }}
-          kubescape scan --format junit --output results.xml .
