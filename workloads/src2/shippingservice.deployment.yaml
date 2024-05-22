@@ -28,7 +28,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: acr4nt534.azurecr.io/shippingservice:9
+        image: acr4nt534.azurecr.io/shippingservice:10
         ports:
         - containerPort: 50051
         env:

@@ -29,7 +29,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: acr4nt534.azurecr.io/currencyservice:9
+        image: acr4nt534.azurecr.io/currencyservice:10
         ports:
         - name: grpc
           containerPort: 7000

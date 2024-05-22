@@ -29,7 +29,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: acr4nt534.azurecr.io/cartservice:9
+        image: acr4nt534.azurecr.io/cartservice:10
         ports:
         - containerPort: 7070
         env:
