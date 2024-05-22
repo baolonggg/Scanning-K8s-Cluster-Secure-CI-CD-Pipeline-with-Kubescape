@@ -44,6 +44,8 @@ spec:
           failureThreshold: 5
           initialDelaySeconds: 3
           periodSeconds: 3
+        securityContext: 
+          allowPrivilegeEsacalation: true
 ---
 apiVersion: v1
 kind: Service
