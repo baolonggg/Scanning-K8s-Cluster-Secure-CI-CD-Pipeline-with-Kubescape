@@ -6,13 +6,16 @@
 - [Description](#description)
 - [Tools](#tools)
 - [Installation](#installation)
+  - [Steps](#steps)
+- [Secure Gate in CI/CD Pipeline](#secure-gate-in-cicd-pipeline)
+  - [Steps](#steps-1)
 
 ## Description
 This project demonstrates using Kubescape as a secure gate in the CI/CD pipeline.
 
 ## Tools
-- Azure Kubernetes Service
-- Azure Container Registry
+- Azure Kubernetes Service (AKS)
+- Azure Container Registry (ACR)
 - Github Actions
 - ArgoCD
 
@@ -27,9 +30,9 @@ This project demonstrates using Kubescape as a secure gate in the CI/CD pipeline
 
 3. **Set up secret variables to connect Azure and Github:**
     ```bash
-    AZURE_CLIENT_ID = <your_client_id>
-    AZURE_TENANT_ID = <your_tenant_id>
-    AZURE_SUBSCRIPTION_ID = <your_subscription_id>
+    AZURE_CLIENT_ID=<your_client_id>
+    AZURE_TENANT_ID=<your_tenant_id>
+    AZURE_SUBSCRIPTION_ID=<your_subscription_id>
     ```
 
 4. **Install ArgoCD on your AKS Cluster by following [these steps](https://argo-cd.readthedocs.io/en/stable/getting_started/).**
@@ -50,3 +53,13 @@ This project demonstrates using Kubescape as a secure gate in the CI/CD pipeline
             - **Namespace:** default
 
 7. **Deploy Successfully**
+
+## Secure Gate in CI/CD Pipeline
+Security Check ensures:
+- Security requirements are checked before deployment is completed.
+- Deployment is stopped if the threshold is reached.
+- No security holes in production.
+
+### Steps
+1. **Secure in CI Step**
+2. **Secure in CD Step**
