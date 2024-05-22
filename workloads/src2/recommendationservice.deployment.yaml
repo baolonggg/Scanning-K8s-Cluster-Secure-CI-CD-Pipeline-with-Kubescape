@@ -29,7 +29,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: acr4nt534.azurecr.io/recommendationservice:9
+        image: acr4nt534.azurecr.io/recommendationservice:10
         ports:
         - containerPort: 8080
         readinessProbe:

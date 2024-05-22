@@ -27,7 +27,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: acr4nt534.azurecr.io/redis:alpine
+        image: acr4nt534.azurecr.io/redis:10
         ports:
         - containerPort: 6379
         readinessProbe:
