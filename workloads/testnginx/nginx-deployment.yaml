@@ -3,19 +3,11 @@ kind: Deployment
 metadata:
   name: nginx-deployment
 spec:
-  replicas: 1  # Adjust the number of replicas as needed
-  selector:
-    matchLabels:
-      app: nginx
+  replicas: 1
   template:
-    metadata:
-      labels:
-        app: nginx
     spec:
       containers:
-      - name: nginx-demo
-        image: acr4nt534.azurecr.io/nginx:1.25.4
+      - name: nginx
+        image: acr4nt534.azurecr.io/nginx:latest
         securityContext:
-          allowPrivilegeEscalation: true
-        ports:
-        - containerPort: 80
+          allowPrivilegeEscalation: false # this field should be set to false explicitly
