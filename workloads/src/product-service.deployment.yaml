@@ -45,7 +45,7 @@ spec:
           initialDelaySeconds: 3
           periodSeconds: 3
         securityContext: 
-          allowPrivilegeEsacalation: true
+          allowPrivilegeEsacalation: false
 ---
 apiVersion: v1
 kind: Service
