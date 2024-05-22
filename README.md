@@ -37,7 +37,7 @@ This project demonstrates using Kubescape as a secure gate in the CI/CD pipeline
 5. **Run the workflow to deploy the microservice app using GitOps.**
 
 6. **Deploy to AKS:**
-    - Create a new Application in ArgoCD.
+    - **Create a new Application in ArgoCD.**
     - **Application Name:** Microservice App
         - **Project Name:** default
         - **Sync Policy:** Automatic
@@ -48,4 +48,5 @@ This project demonstrates using Kubescape as a secure gate in the CI/CD pipeline
         - **Destination:**
             - **Cluster URL:** [https://kubernetes.default.svc](https://kubernetes.default.svc)
             - **Namespace:** default
+
 7. **Deploy Successfully**
