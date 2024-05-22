@@ -17,3 +17,5 @@ spec:
         image: acr4nt534.azurecr.io/nginx:latest
         securityContext:
           allowPrivilegeEscalation: false # this field should be set to false explicitly
+        ports:
+        - containerPort: 80
