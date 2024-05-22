@@ -61,6 +61,8 @@ spec:
           failureThreshold: 5
           initialDelaySeconds: 3
           periodSeconds: 3
+        securityContext: 
+          allowPrivilegeEscalation: false
       initContainers:
       - name: wait-for-rabbitmq
         image: busybox

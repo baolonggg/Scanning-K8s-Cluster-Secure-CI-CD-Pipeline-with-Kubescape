@@ -39,6 +39,8 @@ spec:
         - name: rabbitmq-enabled-plugins
           mountPath: /etc/rabbitmq/enabled_plugins
           subPath: enabled_plugins
+        securityContext: 
+          allowPrivilegeEscalation: false
       volumes:
       - name: rabbitmq-enabled-plugins
         configMap:
