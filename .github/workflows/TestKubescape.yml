@@ -168,7 +168,7 @@ jobs:
         run: |
           export PATH=$PATH:/home/runner/.kubescape/bin
           cd workloads/${{ inputs.APPNAME }}
-          kubescape scan --severity-threshold=critical --format junit --output results.xml .
+          kubescape scan --severity-threshold=high --format junit --output results.xml .
   Update-K8s-Manifests:
     name: Update K8s Deployment Manifest with Image Version
     needs: Run-Kubescape
